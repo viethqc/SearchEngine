@@ -131,6 +131,9 @@
 			var MAX_RESULT_SHOW = 10;
 			var m_iCurrent = 1;							//Current page;
 
+			$(".page-manager").hide();
+			$(".line").hide();
+
 		    $('#text-search').on('input', function() { 
 			    $(".icon").hide();
 			    $(".search").css("padding-top", "30px");
@@ -234,6 +237,7 @@
 			    $(".result").html(szHtml);
 
 			    //Hien thi phan phan trang
+			    $(".page-manager").show();
 			    iPageStart = Math.floor((m_iCurrent - 1) / MAX_SHOW_PAGE) * MAX_SHOW_PAGE;
 			    if (objResult.total - (m_iCurrent - 1) > MAX_SHOW_PAGE)
 			    {
