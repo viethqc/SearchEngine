@@ -7,19 +7,18 @@
 
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/css/index.css">
 
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="/js/bootstrap.min.js" ></script>
 
 	<script src="/js/jquery-3.1.1.min.js"></script>
 
-	<!-- <link rel="stylesheet" href="https://github.com/FortAwesome/Font-Awesome/tree/master/css/font-awesome.min.css" /> -->
+	<script src="/js/index.js"></script>
 
-	<script type="text/javascript">
-		
-	</script>
+	<!-- <link rel="stylesheet" href="https://github.com/FortAwesome/Font-Awesome/tree/master/css/font-awesome.min.css" /> -->
 	<!-- <script src="https://use.fontawesome.com/97ef8f9f0e.js"></script> -->
-	<style type="text/css">
+<!-- 	<style type="text/css">
 		body
 		{
 			background-color: #d4d0c8;
@@ -122,9 +121,9 @@
 		{
 			margin: 0 auto;
 		}
-	</style>
+	</style> -->
 
-	<script type="text/javascript">
+	<!-- <script type="text/javascript">
 		$( document ).ready(function()
 		{
 			var MAX_SHOW_PAGE = 5;
@@ -323,7 +322,7 @@
 				return objResult;
 			}
 		});
-	</script>
+	</script> -->
 </head>
 <body>
 
@@ -333,9 +332,50 @@
 			<div class="col-xs-12 text-center icon">SEARCH ENGINE</div>
 			<div class="col-xs-12 text-center search-box">
 				<input type="text" name="keyword" id = "text-search">
+				<button class= "search-button-icon"><img src = "/icon/search.png"></button>
+				<button class= "advance-search" data-toggle="collapse" data-target="#advance-search-option">Advance Search</button>
 			</div>
+
+			<div id="advance-search-option" class="collapse">
+				<div class="option">
+					<div class="row option-row">
+						<div class="row">
+							<div class="col-xs-6">Tìm trang có...</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-3">tất cả các từ này:</div>
+							<div class="col-xs-5"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-4">Nhập các từ quan trọng: chó sục chuột tam thể</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-3">từ hoặc cụm từ chính xác này:</div>
+							<div class="col-xs-5"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-4">Đặt từ chính xác trong dấu trích dẫn: "chó sục chuột"</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-3">bất kỳ từ nào trong số này:</div>
+							<div class="col-xs-5"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-4">Nhập OR giữa tất cả các từ mà bạn muốn: thu nhỏ OR tiêu chuẩn</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-3">không từ nào trong số này:</div>
+							<div class="col-xs-5"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-4">Đặt dấu trừ ngay trước từ mà bạn không muốn: -loài gặm nhấm, -"Jack Russell"</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-3">các số trong khoảng từ:</div>
+							<div class="col-xs-2"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-1">tới</div>
+							<div class="col-xs-2"><input type="text" name="hello" width="100%"></div>
+							<div class="col-xs-4">Đặt dấu trừ ngay trước từ mà bạn không muốn: -loài gặm nhấm, -"Jack Russell"</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+
 			<div class="col-xs-12 text-center search-button">
-				<button class="btn btn-info" id = "search-btn">Search</button>
+				<button id = "search-btn">Search</button>
 			</div>
 			<div class="col-xs-12 line">
 				<hr>

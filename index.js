@@ -6,6 +6,7 @@ var http = require('http');
 var Promise = require('promise');
 
 app.use(express.static(__dirname + "/bootstrap-3.3.7-dist"))
+app.use(express.static(__dirname + "/public"))
 app.set('port', 9999);
 app.set('views', __dirname + "/views")
 app.set('view engine', 'jade')
