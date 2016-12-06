@@ -60,6 +60,7 @@ body
 .line, .result
 {
 	/*display: none;*/
+	color: black;
 }
 
 .title
