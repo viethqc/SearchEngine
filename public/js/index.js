@@ -227,8 +227,10 @@ $( document ).ready(function()
 		for (var i = 0; i < arrPartDoc.length; i++)
 		{
 			iCount = 0;
+			arrPartDoc[i] = arrPartDoc[i].toLowerCase();
 			for (var j = 0; j < arrParts.length; j++)
 			{
+				arrParts[j] = arrParts[j].toLowerCase();
 				if (arrPartDoc[i].indexOf(arrParts[j]) == -1)
 				{
 					continue;
@@ -255,12 +257,11 @@ $( document ).ready(function()
 		strResult = "";
 		for (var i = 0; i < arrObj.length; i++)
 		{
-			if (arrObj[i].rank == 0)
+			strResult += arrPartDocAfferHighLight[arrObj[i].id];
+			if (strResult.length > 200)
 			{
 				break;
 			}
-
-			strResult += arrPartDocAfferHighLight[arrObj[i].id];
 		}
 
 		for (var i = 0; i < arrParts.length; i++)
