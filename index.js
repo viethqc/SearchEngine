@@ -18,120 +18,156 @@ app.get('/', function(req, res) {
 })
 
 app.get("/search", function(req, res){
-	var objURLParse = null;
-	var szPathName = "";
-	var szQuery = "";
-	var objQuery = null;
+		var objURLParse = null;
+		var szPathName = "";
+		var szQuery = "";
+		var objQuery = null;
 
-	objURLParse = url.parse(req.url);
-	szPathName = objURLParse.pathname;
-	szQuery = objURLParse.query;
+		objURLParse = url.parse(req.url);
+		szPathName = objURLParse.pathname;
+		szQuery = objURLParse.query;
 
-	res.writeHead(200, { 'Content-Type': 'application/json' });
+		res.writeHead(200, { 'Content-Type': 'application/json' });
 
-	objQuery = ConvertQueryToJson(szQuery);
-	if (objQuery == null)
-	{
-		res.write("{}");
-		res.end();
-	}
-
-	console.log(objQuery);
-
-	var szResultTitle = null;
-	var szResultURL = null;
-	var szResultContent = null;
-	var objResult = {};
-	var szURL = "";
-	var arrTitleCode = [];
-	var arrContentCode = [];
-
-	szURL = DOMAIN + "fl=code&indent=on&q=title:*" + objQuery["keyword"] +"*&rows=0&wt=json";
-	QueryByURL(szURL).then(function(response){
-		response = JSON.parse(response);
-		console.log("title : " + response["response"]["numFound"]);
-
-		szURL = DOMAIN + "fl=code&indent=on&q=title:*" + objQuery["keyword"] +"*&rows=" + response["response"]["numFound"] + "&wt=json";
-		return QueryByURL(szURL);
-	})
-	.then(function(response){
-		response = JSON.parse(response);
-		for (var i = 0; i < response["response"]["docs"].length; i++)
+		objQuery = ConvertQueryToJson(szQuery);
+		if (objQuery == null)
 		{
-			arrTitleCode.push(response["response"]["docs"][i]["code"]);
+			res.write("{}");
+			res.end();
 		}
 
-		szURL = DOMAIN + "fl=code&indent=on&q=content:*" + objQuery["keyword"] +"*&rows=0&wt=json";
-		return QueryByURL(szURL);
-	})
-	.then(function(response){
-		response = JSON.parse(response);
-		console.log("content : " + response["response"]["numFound"]);
+		console.log(objQuery);
 
-		szURL = DOMAIN + "fl=code&indent=on&q=content:*" + objQuery["keyword"] +"*&rows=" + response["response"]["numFound"] + "&wt=json";
-		return QueryByURL(szURL);
-	})
-	.then(function(response){
-		response = JSON.parse(response);
-		for (var i = 0; i < response["response"]["docs"].length; i++)
+		var szResultTitle = null;
+		var szResultURL = null;
+		var szResultContent = null;
+		var objResult = {};
+		var szURL = "";
+		var arrTitleCode = [];
+		var arrContentCode = [];
+		var szDate = "";
+		var szDropwordTitle = "";
+		var szDropwordContent = "";
+		var szTitleMath = "";
+		var szContentMath = "";
+
+		//So khop
+		var szTitle = "";
+		if (objQuery["match"] !== "")
 		{
-			arrContentCode.push(response["response"]["docs"][i]["code"]);
-		}
-
-		for (var i = 0; i < arrContentCode.length; i++)
-		{
-			if (arrTitleCode.indexOf(arrContentCode[i]) != -1)
-			{
-				continue;
-			}
-
-			arrTitleCode.push(arrContentCode[i]);
-		}
-
-		objResult.total = arrTitleCode.length;
-		objResult.docs = [];
-		var iStart = (parseInt(objQuery["p"]) - 1) * 10;
-		var iEnd = -1;
-		if (arrTitleCode.length - iStart > 10)
-		{
-			iEnd = iStart + 10;
+			// console.log("advance search");
+			// objQuery["keyword"] = "\"" + objQuery["keyword"] + "\"";
+			szTitleMath = " AND title:\"" + objQuery["match"] + "\"" ;
+			szContentMath = " AND content:\"" + objQuery["match"] + "\"" ;
 		}
 		else
 		{
-			iEnd = arrTitleCode.length;
+			// console.log("nomal search");
+			// objQuery["keyword"] = "\"" + objQuery["keyword"] + "\"~3";	
 		}
 
-		console.log("total :" + arrTitleCode.length);
-		console.log("page : " + objQuery["p"]);
-		console.log("start : " + iStart);
-		console.log("end : " + iEnd);
-
-		var arrPromise = [];
-		var szURL = "";
-		var json;
-
-		for (var i = iStart; i < iEnd; i++)
+		if (objQuery["dropword"] !== "")
 		{
-			console.log(arrTitleCode[i]);
-			szURL = DOMAIN + "indent=on&q=code:" + arrTitleCode[i] + "&wt=json";
-			arrPromise.push(QueryByURL(szURL));
+			szDropwordTitle = " AND -title:\"" + objQuery["dropword"] + "\"" ;
+			szDropwordContent = " AND -content:\"" + objQuery["dropword"] + "\"" ;
 		}
 
-		console.log("result : ");
-		Promise.all(arrPromise).then(function(response)
+		//Truy van theo ngay
+		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
 		{
-			for (var i = 0; i < response.length; i++)
+			szDate += " AND date:[" + objQuery["datestart"] +"T01:00:00Z%20TO%20" + objQuery["dateend"] + "T12:19:00Z]";
+		}
+
+		szURL = DOMAIN + "fl=code&indent=on&q=title:\"" + objQuery["keyword"] + "\"~3" + szTitleMath + szDate + szDropwordTitle + "&rows=0&wt=json";
+		console.log(szURL);
+		QueryByURL(szURL).then(function(response){
+			response = JSON.parse(response);
+			console.log("title : " + response["response"]["numFound"]);
+
+			szURL = DOMAIN + "fl=code&indent=on&q=title:\"" + objQuery["keyword"] + "\"~3" + szTitleMath + szDate + szDropwordTitle + "&rows=" + response["response"]["numFound"] + "&wt=json";
+			console.log(szURL);
+			return QueryByURL(szURL);
+		})
+		.then(function(response){
+			response = JSON.parse(response);
+			for (var i = 0; i < response["response"]["docs"].length; i++)
 			{
-				json = JSON.parse(response[i]);
-				objResult.docs.push(json["response"]["docs"][0]);
-				console.log(i + " - " + json["response"]["docs"][0]["code"]);
+				arrTitleCode.push(response["response"]["docs"][i]["code"]);
 			}
 
-			res.write(JSON.stringify(objResult));
-			res.end();
+			szURL = DOMAIN + "fl=code&indent=on&q=content:\"" + objQuery["keyword"] + "\"~3" + szContentMath + szDate + szDropwordContent + "&rows=0&wt=json";
+			console.log(szURL);
+			return QueryByURL(szURL);
 		})
+		.then(function(response){
+			response = JSON.parse(response);
+			console.log("content : " + response["response"]["numFound"]);
 
-	})
+			szURL = DOMAIN + "fl=code&indent=on&q=content:\"" + objQuery["keyword"] + "\"~3" + szContentMath + szDate + szDropwordContent + "&rows=" + response["response"]["numFound"] + "&wt=json";
+			console.log(szURL);
+			return QueryByURL(szURL);
+		})
+		.then(function(response){
+			response = JSON.parse(response);
+			for (var i = 0; i < response["response"]["docs"].length; i++)
+			{
+				arrContentCode.push(response["response"]["docs"][i]["code"]);
+			}
+
+			for (var i = 0; i < arrContentCode.length; i++)
+			{
+				if (arrTitleCode.indexOf(arrContentCode[i]) != -1)
+				{
+					continue;
+				}
+
+				arrTitleCode.push(arrContentCode[i]);
+			}
+
+			objResult.total = arrTitleCode.length;
+			objResult.docs = [];
+			var iStart = (parseInt(objQuery["p"]) - 1) * 10;
+			var iEnd = -1;
+			if (arrTitleCode.length - iStart > 10)
+			{
+				iEnd = iStart + 10;
+			}
+			else
+			{
+				iEnd = arrTitleCode.length;
+			}
+
+			console.log("total :" + arrTitleCode.length);
+			console.log("page : " + objQuery["p"]);
+			console.log("start : " + iStart);
+			console.log("end : " + iEnd);
+
+			var arrPromise = [];
+			var szURL = "";
+			var json;
+
+			for (var i = iStart; i < iEnd; i++)
+			{
+				console.log(arrTitleCode[i]);
+				szURL = DOMAIN + "indent=on&q=code:" + arrTitleCode[i] + "&wt=json";
+				arrPromise.push(QueryByURL(szURL));
+			}
+
+			console.log("result : ");
+			Promise.all(arrPromise).then(function(response)
+			{
+				for (var i = 0; i < response.length; i++)
+				{
+					json = JSON.parse(response[i]);
+					objResult.docs.push(json["response"]["docs"][0]);
+					console.log(i + " - " + json["response"]["docs"][0]["code"]);
+				}
+
+				res.write(JSON.stringify(objResult));
+				res.end();
+			})
+
+		})
 	
 	// Query(objQuery["keyword"], "TITLE", parseInt(objQuery["p"]))
 	// .then(function(response){

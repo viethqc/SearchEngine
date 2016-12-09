@@ -24,7 +24,10 @@ $( document ).ready(function()
 		if (m_bAdvanceSearch == true)
 			$(".collapse").show();
 		else
+		{
 			$(".collapse").hide();
+
+		}
 	});
 
 	$('#text-search').keypress(function (e) {
@@ -52,12 +55,15 @@ $( document ).ready(function()
 	function Search(szKeyword, szPage)
 	{
 		var szQueryUrl = "";
+		var szType = "";
 		if (szKeyword === "")
 		{
 			return;
 		}
 
-		szQueryUrl = "http://localhost:9999/search?keyword=" + szKeyword + "&p=" + szPage;
+		szQueryUrl = "http://localhost:9999/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
+					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val();
+
 		$.ajax({
 		    url: szQueryUrl,
 		    crossDomain: true,
@@ -135,7 +141,13 @@ $( document ).ready(function()
 	    	szHtml += '<div class="single-result">';
 	    	szHtml += '<div class="title"><a href = "' + objDoc[i]["url"] + '" target = "_blank">' + objDoc[i]["title"] + '</a></div>';
 	    	szHtml += '<div class="url">' + objDoc[i]["url"] + '</div>';
-	    	szHtml += '<div class="content">' + HighLight(objDoc[i]["content"][0], szSearchText) + "</div>";
+
+	    	if (objDoc[i].hasOwnProperty("content") === true)
+	    	{
+	    		szHtml += '<div class="content">' + HighLight(objDoc[i]["content"][0], szSearchText) + "</div>";
+	    	}
+	    	else
+	    		szHtml += '<div class="content">' + "</div>";
 	    	szHtml += '</div>';
 	    }
 
