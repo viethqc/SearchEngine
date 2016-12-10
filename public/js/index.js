@@ -22,11 +22,17 @@ $( document ).ready(function()
 		m_bAdvanceSearch = !m_bAdvanceSearch;
 
 		if (m_bAdvanceSearch == true)
+		{
 			$(".collapse").show();
+		}
 		else
 		{
 			$(".collapse").hide();
-
+			$("#date-start").val("");
+			$("#date-end").val("");
+			$("#drop-word").val("");
+			$("#any-word").val("");
+			$("#match-search").val("");
 		}
 	});
 
@@ -48,6 +54,7 @@ $( document ).ready(function()
 
 	$("#search-btn").click(function(){
 		var szTextSearch = $("#text-search").val();
+		$("#search-all").val(szTextSearch);
 		m_iCurrent = 1;
 		Search(szTextSearch, 1);
 	});
@@ -56,6 +63,17 @@ $( document ).ready(function()
 	{
 		var szQueryUrl = "";
 		var szType = "";
+
+		if ($("#search-all").val() === "")
+		{
+			$("#search-all").val(szKeyword);
+		}
+		else
+		{
+			szKeyword = $("#search-all").val();
+			$("#text-search").val(szKeyword);
+		}
+
 		if (szKeyword === "")
 		{
 			return;
