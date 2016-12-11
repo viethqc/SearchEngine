@@ -6,6 +6,7 @@ var http = require('http');
 var Promise = require('promise');
 var async = require('async');
 var DOMAIN = "http://localhost:8983/solr/btl-tktdtt/select?";
+//var process = require('process');
 
 app.use(express.static(__dirname + "/bootstrap-3.3.7-dist"))
 app.use(express.static(__dirname + "/public"))
@@ -17,7 +18,14 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + "/views" + "/index.html");
 })
 
+process.on('uncaughtException', function(ex) {
+	console.log(ex);
+});
+
 app.get("/search", function(req, res){
+
+	try
+	{
 		var objURLParse = null;
 		var szPathName = "";
 		var szQuery = "";
@@ -168,6 +176,11 @@ app.get("/search", function(req, res){
 			})
 
 		})
+	}
+	catch (e)
+	{
+		console.log(e);
+	}
 	
 	// Query(objQuery["keyword"], "TITLE", parseInt(objQuery["p"]))
 	// .then(function(response){

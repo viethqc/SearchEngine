@@ -49,12 +49,18 @@ $( document ).ready(function()
 	$(".search-button-icon").click(function(){
 		var szTextSearch = $("#text-search").val();
 		m_iCurrent = 1;
+
 		Search(szTextSearch, 1);
 	});
 
 	$("#search-btn").click(function(){
 		var szTextSearch = $("#text-search").val();
-		$("#search-all").val(szTextSearch);
+
+		if (m_bAdvanceSearch == true)
+		{
+			$("#search-all").val(szTextSearch);
+		}
+
 		m_iCurrent = 1;
 		Search(szTextSearch, 1);
 	});
@@ -63,16 +69,6 @@ $( document ).ready(function()
 	{
 		var szQueryUrl = "";
 		var szType = "";
-
-		if ($("#search-all").val() === "")
-		{
-			$("#search-all").val(szKeyword);
-		}
-		else
-		{
-			szKeyword = $("#search-all").val();
-			$("#text-search").val(szKeyword);
-		}
 
 		if (szKeyword === "")
 		{
@@ -305,6 +301,7 @@ $( document ).ready(function()
 	function HighLightSentence(strSentence, strKeyword)
 	{
 		var arrPart = [];
+		var arrParts = [];
 		var uniqueKeyword = [];
 		var strKey;
 		var iIndex;
@@ -324,12 +321,21 @@ $( document ).ready(function()
 			}
 		}
 
+		for (var i = 0; i < arrPart.length; i++)
+		{
+			if (arrPart[i] === "")
+			{
+				continue;
+			}
+			arrParts.push(arrPart[i]);
+		}
+
 		strKey = uniqueKeyword[0];
 		strNewSentence = "";
 		var strTmp = strLowerCaseSentence;
-		for (var i = 0; i < arrPart.length; i++)
+		for (var i = 0; i < arrParts.length; i++)
 		{
-			var regex = new RegExp(arrPart[i], "gi"), result, indices = [], origin = [];
+			var regex = new RegExp(arrParts[i], "gi"), result, indices = [], origin = [];
 			while ( (result = regex.exec(strTmp)) ) {
 			    indices.push(result.index);
 			}
