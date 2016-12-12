@@ -151,10 +151,13 @@ $( document ).ready(function()
 	    $(".result").text("");
 	    for (var i = 0; i < objDoc.length; i++)
 	    {
+	    	objDoc[i]["date"] = objDoc[i]["date"].replace(/[T]/g, " ");
+	    	objDoc[i]["date"] = objDoc[i]["date"].replace(/[Z]/g, " ");
 	    	// objResult[i]["content"][0] = objResult[i]["content"][0].replace(reg, '<b>' + szSearchText +'</b>');
 	    	szHtml += '<div class="single-result">';
 	    	szHtml += '<div class="title"><a href = "' + objDoc[i]["url"] + '" target = "_blank">' + objDoc[i]["title"] + '</a></div>';
 	    	szHtml += '<div class="url">' + objDoc[i]["url"] + '</div>';
+	    	szHtml += '<div class="date"> Date : ' + objDoc[i]["date"] + '</div>';
 
 	    	if (objDoc[i].hasOwnProperty("content") === true)
 	    	{

@@ -83,7 +83,7 @@ app.get("/search", function(req, res){
 		//Truy van theo ngay
 		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
 		{
-			szDate += " AND date:[" + objQuery["datestart"] +"T01:00:00Z%20TO%20" + objQuery["dateend"] + "T12:19:00Z]";
+			szDate += " AND date:[" + objQuery["datestart"] +"T00:00:00Z%20TO%20" + objQuery["dateend"] + "T23:59:59Z]";
 		}
 
 		szURL = DOMAIN + "fl=code&indent=on&q=title:\"" + objQuery["keyword"] + "\"~3" + szTitleMath + szDate + szDropwordTitle + "&rows=0&wt=json";
