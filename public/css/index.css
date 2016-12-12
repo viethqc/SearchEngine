@@ -110,6 +110,12 @@ body
 {
 	width: 70%;
 	margin: 0 auto;
+	display: none;
+}
+
+.line
+{
+	display: none;
 }
 
 .page-manager-inner

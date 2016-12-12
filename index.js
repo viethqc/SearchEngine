@@ -18,11 +18,15 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + "/views" + "/index.html");
 })
 
+app.get('/search', function(req, res) {
+	res.sendFile(__dirname + "/views" + "/index.html");
+})
+
 process.on('uncaughtException', function(ex) {
 	console.log(ex);
 });
 
-app.get("/search", function(req, res){
+app.get("/searchapi", function(req, res){
 
 	try
 	{
@@ -58,41 +62,117 @@ app.get("/search", function(req, res){
 		var szDropwordContent = "";
 		var szTitleMath = "";
 		var szContentMath = "";
+		var szTitleNomal = "";
+		var szContentNormal = "";
 
-		//So khop
-		var szTitle = "";
+		var arrTitleSearch = [];
+		var arrContentSearch = [];
+		var szTitleQuery = "";
+		var szContentQuery = "";
+
+		for (var i = 0; i < 10; i++)
+		{
+			arrTitleSearch[i] = "";
+			arrContentSearch[i] = "";
+		}
+
+		//Search Normal
+		if (objQuery["keyword"] !== "")
+		{
+			arrTitleSearch[0] = "title:\"" + objQuery["keyword"] + "\"~3";
+			arrContentSearch[0] = "content:\"" + objQuery["keyword"] + "\"~3";
+		}
+
 		if (objQuery["match"] !== "")
 		{
-			// console.log("advance search");
-			// objQuery["keyword"] = "\"" + objQuery["keyword"] + "\"";
-			szTitleMath = " AND title:\"" + objQuery["match"] + "\"" ;
-			szContentMath = " AND content:\"" + objQuery["match"] + "\"" ;
-		}
-		else
-		{
-			// console.log("nomal search");
-			// objQuery["keyword"] = "\"" + objQuery["keyword"] + "\"~3";	
+			console.log("match");
+			arrTitleSearch[1] = "title:\"" + objQuery["match"] + "\"";
+			arrContentSearch[1] = "content:\"" + objQuery["keyword"] + "\"";
 		}
 
 		if (objQuery["dropword"] !== "")
 		{
-			szDropwordTitle = " AND -title:\"" + objQuery["dropword"] + "\"" ;
-			szDropwordContent = " AND -content:\"" + objQuery["dropword"] + "\"" ;
+			arrTitleSearch[2] = "-title:\"" + objQuery["dropword"] + "\"" ;
+			arrContentSearch[2] = "-content:\"" + objQuery["dropword"] + "\"" ;
 		}
 
-		//Truy van theo ngay
 		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
 		{
-			szDate += " AND date:[" + objQuery["datestart"] +"T00:00:00Z%20TO%20" + objQuery["dateend"] + "T23:59:59Z]";
+			arrTitleSearch[3] += "date:[" + objQuery["datestart"] +"T00:00:00Z%20TO%20" + objQuery["dateend"] + "T23:59:59Z]";
+			arrContentSearch[3] += "date:[" + objQuery["datestart"] +"T00:00:00Z%20TO%20" + objQuery["dateend"] + "T23:59:59Z]";
 		}
 
-		szURL = DOMAIN + "fl=code&indent=on&q=title:\"" + objQuery["keyword"] + "\"~3" + szTitleMath + szDate + szDropwordTitle + "&rows=0&wt=json";
+		if (objQuery["any-word"] !== "")
+		{
+			arrTitleSearch[4] = "title:(" + objQuery["any-word"] + ")";
+			arrContentSearch[4] = "content:(" + objQuery["any-word"] + ")";
+		}
+
+		if (objQuery["search-all"] !== "")
+		{
+			arrTitleSearch[5] = "title:(" + objQuery["search-all"] + ")";
+			arrContentSearch[5] = "content:(" + objQuery["search-all"] + ")";
+		}
+
+		for (var i = 0; i < arrTitleSearch.length; i++)
+		{
+			if (arrTitleSearch[i] === "")
+			{
+				continue;
+			}
+
+			if (i != 0 && i != arrTitleSearch.length - 1)
+			{
+				szTitleQuery += " AND ";
+			}
+
+			szTitleQuery += arrTitleSearch[i];
+		}
+
+		for (var i = 0; i < arrContentSearch.length; i++)
+		{
+			if (arrContentSearch[i] === "")
+			{
+				continue;
+			}
+
+			if (i != 0 && i != arrContentSearch.length - 1)
+			{
+				szContentQuery += " AND ";
+			}
+
+			szContentQuery += arrContentSearch[i];
+		}
+
+		//So khop
+		// var szTitle = "";
+		// if (objQuery["match"] !== "")
+		// {
+		// 	// console.log("advance search");
+		// 	// objQuery["keyword"] = "\"" + objQuery["keyword"] + "\"";
+		// 	szTitleMath = " AND title:\"" + objQuery["match"] + "\"" ;
+		// 	szContentMath = " AND content:\"" + objQuery["match"] + "\"" ;
+		// }
+
+		// if (objQuery["dropword"] !== "")
+		// {
+		// 	szDropwordTitle = " AND -title:\"" + objQuery["dropword"] + "\"" ;
+		// 	szDropwordContent = " AND -content:\"" + objQuery["dropword"] + "\"" ;
+		// }
+
+		//Truy van theo ngay
+		// if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
+		// {
+		// 	szDate += " AND date:[" + objQuery["datestart"] +"T00:00:00Z%20TO%20" + objQuery["dateend"] + "T23:59:59Z]";
+		// }
+
+		szURL = DOMAIN + "fl=code&indent=on&q=" + szTitleQuery + "&rows=0&wt=json";
 		console.log(szURL);
 		QueryByURL(szURL).then(function(response){
 			response = JSON.parse(response);
 			console.log("title : " + response["response"]["numFound"]);
 
-			szURL = DOMAIN + "fl=code&indent=on&q=title:\"" + objQuery["keyword"] + "\"~3" + szTitleMath + szDate + szDropwordTitle + "&rows=" + response["response"]["numFound"] + "&wt=json";
+			szURL = DOMAIN + "fl=code&indent=on&q=" + szTitleQuery + "&rows=" + response["response"]["numFound"] + "&wt=json";
 			console.log(szURL);
 			return QueryByURL(szURL);
 		})
@@ -103,7 +183,7 @@ app.get("/search", function(req, res){
 				arrTitleCode.push(response["response"]["docs"][i]["code"]);
 			}
 
-			szURL = DOMAIN + "fl=code&indent=on&q=content:\"" + objQuery["keyword"] + "\"~3" + szContentMath + szDate + szDropwordContent + "&rows=0&wt=json";
+			szURL = DOMAIN + "fl=code&indent=on&q=" + szContentQuery + "&rows=0&wt=json";
 			console.log(szURL);
 			return QueryByURL(szURL);
 		})
@@ -111,7 +191,7 @@ app.get("/search", function(req, res){
 			response = JSON.parse(response);
 			console.log("content : " + response["response"]["numFound"]);
 
-			szURL = DOMAIN + "fl=code&indent=on&q=content:\"" + objQuery["keyword"] + "\"~3" + szContentMath + szDate + szDropwordContent + "&rows=" + response["response"]["numFound"] + "&wt=json";
+			szURL = DOMAIN + "fl=code&indent=on&q=" + szContentQuery + "&rows=" + response["response"]["numFound"] + "&wt=json";
 			console.log(szURL);
 			return QueryByURL(szURL);
 		})

@@ -5,9 +5,6 @@ $( document ).ready(function()
 	var m_iCurrent = 1;							//Current page;
 	var m_bAdvanceSearch = false;
 
-	$(".page-manager").hide();
-	$(".line").hide();
-
     $('#text-search').on('input', function() { 
 	    $(".icon").hide();
 	    $(".search").css("padding-top", "30px");
@@ -75,9 +72,44 @@ $( document ).ready(function()
 			return;
 		}
 
-		szQueryUrl = "http://localhost:9999/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
+		var arrPart = $("#search-all").val().split(" ");
+		var szSearchAll = "";
+		var szAnyWord = "";
+		for (var i = 0; i < arrPart.length; i++)
+		{
+			if (arrPart[i] === "")
+			{
+				continue;
+			}
+
+			if (i != 0)
+			{
+				szSearchAll += "+";
+			}
+
+			szSearchAll += arrPart[i];
+		}
+
+		arrPart = $("#any-word").val().split(" ");
+		var szAnyWord = "";
+		for (var i = 0; i < arrPart.length; i++)
+		{
+			if (arrPart[i] === "")
+			{
+				continue;
+			}
+
+			if (i != 0)
+			{
+				szAnyWord += " ";
+			}
+
+			szAnyWord += arrPart[i];
+		}
+
+		szQueryUrl = "http://localhost:9999/searchapi?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
 					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
-					"&any-word=" + $("#any-word");
+					"&any-word=" + szAnyWord + "&search-all=" + szSearchAll;
 
 		$.ajax({
 		    url: szQueryUrl,
@@ -385,4 +417,18 @@ $( document ).ready(function()
 
 		return objResult;
 	}
+
+	function getParameterByName(name, url)
+	{
+	    if (!url)
+	    {
+	      	url = window.location.href;
+	    }
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	     results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
+	}	
 });
