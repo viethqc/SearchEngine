@@ -76,7 +76,8 @@ $( document ).ready(function()
 		}
 
 		szQueryUrl = "http://localhost:9999/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
-					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val();
+					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
+					"&any-word=" + $("#any-word");
 
 		$.ajax({
 		    url: szQueryUrl,
@@ -183,7 +184,7 @@ $( document ).ready(function()
 	    }
 
 	    var i = iPageStart;
-	    var iMaxpage = Math.round(objResult.total / MAX_RESULT_SHOW) + 1;
+	    var iMaxpage = Math.round(objResult.total / MAX_RESULT_SHOW);
 
 		$(".page a").each(function(index){
 			$(this).text(i + 1);
