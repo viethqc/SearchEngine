@@ -92,7 +92,7 @@ $( document ).ready(function()
 
 			if (i != 0)
 			{
-				szSearchAll += "+";
+				szSearchAll += " ";
 			}
 
 			szSearchAll += arrPart[i];
@@ -109,7 +109,7 @@ $( document ).ready(function()
 
 			if (i != 0)
 			{
-				szAnyWord += " ";
+				szAnyWord += "+";
 			}
 
 			szAnyWord += arrPart[i];

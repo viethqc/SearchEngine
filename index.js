@@ -34,11 +34,14 @@ app.get("/searchapi", function(req, res){
 		var szPathName = "";
 		var szQuery = "";
 		var objQuery = null;
+
+		console.log("origin url : " + req.url);
 		var uri_dec = decodeURIComponent(req.url);
+		console.log("origin decoded : " + uri_dec);
 
 		objURLParse = url.parse(uri_dec);
 		szPathName = objURLParse.pathname;
-		szQuery = objURLParse.query;
+		szQuery = decodeURIComponent(objURLParse.query);
 
 		res.writeHead(200, { 'Content-Type': 'application/json' });
 
@@ -80,21 +83,20 @@ app.get("/searchapi", function(req, res){
 		//Search Normal
 		if (objQuery["keyword"] !== "")
 		{
-			arrTitleSearch[0] = encodeURI("title:\"" + objQuery["keyword"] + "\"~3");
-			arrContentSearch[0] = encodeURI("content:\"" + objQuery["keyword"] + "\"~3");
+			arrTitleSearch[0] = "title:\"" + objQuery["keyword"] + "\"~3";
+			arrContentSearch[0] = "content:\"" + objQuery["keyword"] + "\"~3";
 		}
 
 		if (objQuery["match"] !== "")
 		{
-			console.log("match");
-			arrTitleSearch[1] = encodeURI("title:\"" + objQuery["match"] + "\"");
-			arrContentSearch[1] = encodeURI("content:\"" + objQuery["keyword"] + "\"");
+			arrTitleSearch[1] = "title:\"" + objQuery["match"] + "\"";
+			arrContentSearch[1] = "content:\"" + objQuery["match"] + "\"";
 		}
 
 		if (objQuery["dropword"] !== "")
 		{
-			arrTitleSearch[2] = encodeURI("-title:\"" + objQuery["dropword"] + "\" AND -content:\"" + objQuery["dropword"] + "\"");
-			arrContentSearch[2] = encodeURI("-title:\"" + objQuery["dropword"] + "\" AND -content:\"" + objQuery["dropword"] + "\"") ;
+			arrTitleSearch[2] = "-title:\"" + objQuery["dropword"] + "\" AND -content:\"" + objQuery["dropword"] + "\"";
+			arrContentSearch[2] = "-title:\"" + objQuery["dropword"] + "\" AND -content:\"" + objQuery["dropword"] + "\"" ;
 		}
 
 		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
@@ -105,19 +107,19 @@ app.get("/searchapi", function(req, res){
 
 		if (objQuery["any-word"] !== "")
 		{
-			arrTitleSearch[4] = encodeURI("title:(" + objQuery["any-word"] + ")");
-			arrContentSearch[4] = encodeURI("content:(" + objQuery["any-word"] + ")");
+			arrTitleSearch[4] = "title:(" + objQuery["any-word"] + ")";
+			arrContentSearch[4] = "content:(" + objQuery["any-word"] + ")";
 		}
 
 		if (objQuery["search-all"] !== "")
 		{
-			arrTitleSearch[5] = encodeURI("title:(" + objQuery["search-all"] + ")");
-			arrContentSearch[5] = encodeURI("content:(" + objQuery["search-all"] + ")");
+			arrTitleSearch[5] = "title:(" + objQuery["search-all"] + ")";
+			arrContentSearch[5] = "content:(" + objQuery["search-all"] + ")";
 		}
 
 		for (var i = 0; i < arrTitleSearch.length; i++)
 		{
-			if (arrTitleSearch[i] === "")
+			if (arrTitleSearch[i] === "" ||  i == 3)
 			{
 				continue;
 			}
@@ -135,7 +137,7 @@ app.get("/searchapi", function(req, res){
 
 		for (var i = 0; i < arrContentSearch.length; i++)
 		{
-			if (arrContentSearch[i] === "")
+			if (arrContentSearch[i] === "" ||  i == 3)
 			{
 				continue;
 			}
@@ -149,6 +151,29 @@ app.get("/searchapi", function(req, res){
 			}
 
 			szContentQuery += arrContentSearch[i];
+		}
+
+		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
+		{
+			szTitleQuery += " AND ";
+			szTitleQuery = encodeURI(szTitleQuery);
+			szTitleQuery += arrTitleSearch[3];
+		}
+		else
+		{
+			szTitleQuery = encodeURI(szTitleQuery);
+		}
+
+		
+		if (objQuery["datestart"] !== "" && objQuery["dateend"] !== "")
+		{
+			szContentQuery += " AND ";
+			szContentQuery = encodeURI(szContentQuery);
+			szContentQuery += arrContentSearch[3];
+		}
+		else
+		{
+			szContentQuery = encodeURI(szContentQuery);
 		}
 
 		//So khop
@@ -344,7 +369,7 @@ function QueryByURL(szQueryUrl)
 {
 	var szResponse = "";
 
-	console.log(encodeURI(szQueryUrl));
+	console.log(szQueryUrl);
 
 	return new Promise(function(resolve, reject) {
    		http.get(szQueryUrl, function(response){
