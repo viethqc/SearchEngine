@@ -5,6 +5,19 @@ $( document ).ready(function()
 	var m_iCurrent = 1;							//Current page;
 	var m_bAdvanceSearch = false;
 
+	Init();
+
+	window.onhashchange = function() {
+	 var  i = 0;
+ 		i++;
+	}
+
+	// Vanilla javascript
+	window.addEventListener('popstate', function (e) {
+	    var state = e.state;
+	        Init();
+	});
+
     $('#text-search').on('input', function() { 
 	    $(".icon").hide();
 	    $(".search").css("padding-top", "30px");
@@ -67,11 +80,6 @@ $( document ).ready(function()
 		var szQueryUrl = "";
 		var szType = "";
 
-		if (szKeyword === "")
-		{
-			return;
-		}
-
 		var arrPart = $("#search-all").val().split(" ");
 		var szSearchAll = "";
 		var szAnyWord = "";
@@ -110,6 +118,17 @@ $( document ).ready(function()
 		szQueryUrl = "http://localhost:9999/searchapi?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
 					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
 					"&any-word=" + szAnyWord + "&search-all=" + szSearchAll;
+		var obj = "/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
+					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
+					"&any-word=" + szAnyWord + "&search-all=" + szSearchAll;
+
+		var szTmp = "http://localhost:9999/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
+					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
+					"&any-word=" + szAnyWord + "&search-all=" + szSearchAll;
+		if (szTmp != decodeURIComponent(document.URL))
+		{
+			window.history.pushState("hello", "Search Engine", obj);
+		}
 
 		$.ajax({
 		    url: szQueryUrl,
@@ -165,8 +184,6 @@ $( document ).ready(function()
 	    var szRegText = "";
 
 	    var objDoc = objResult.docs;
-	    
-	    reg = new RegExp(szKeywordSearch, "img");
 
 	    if (objDoc.length == 0)
 	    {
@@ -178,6 +195,7 @@ $( document ).ready(function()
 									"<li>Hãy thử những từ khóa chung hơn.</li>"							+
 									"<li>Hãy thử bớt từ khóa.</li>"										+									
 								"</ul>");
+	    	$(".page-manager").hide();
 	    	return;
 	    }
 
@@ -431,4 +449,79 @@ $( document ).ready(function()
 	    if (!results[2]) return '';
 	    return decodeURIComponent(results[2].replace(/\+/g, " "));
 	}	
+
+	function Init()
+	{
+		var szUrl = document.URL;
+
+		if (szUrl.indexOf("/search") === -1)
+		{
+			$("#search-btn").show();
+			$(".line").hide();
+			$(".result").text("");
+			$(".result").hide();
+			$(".advance-search").hide();
+			$(".page-manager").hide();
+			$(".icon").show();
+			$("#text-search").val("");
+			$(".collapse").hide();
+
+			return;
+		}
+		var szKeyword = getParameterByName("keyword", document.url);
+		var szPage = getParameterByName("p", document.url);
+		var szMatch = getParameterByName("match", document.url);
+		var szDateStart = getParameterByName("datestart", document.url);
+		var szDateEnd = getParameterByName("dateend", document.url);
+		var szDropword = getParameterByName("dropword", document.url);
+		var szAnyWord = getParameterByName("any-word", document.url);
+		var szSearchAll = getParameterByName("search-all", document.url);
+
+		if (szMatch !== "" || szDateStart !== "" || szDateEnd !== "" || szDropword !== "" || szAnyWord !== "" || szSearchAll !== "")
+		{
+			m_bAdvanceSearch = true;
+		}
+
+		if (szUrl.indexOf("search") != -1)
+		{
+			$(".icon").hide();
+		    $(".search").css("padding-top", "30px");
+		    $(".line").show();
+		    $(".result").show();
+		    $(".search-button-icon").show();
+			$(".advance-search").show();
+			$("#search-btn").hide();
+		}
+
+		if (m_bAdvanceSearch == true)
+		{
+			$(".collapse").show();
+		}
+		else
+		{
+			$(".collapse").hide();
+			$("#date-start").val("");
+			$("#date-end").val("");
+			$("#drop-word").val("");
+			$("#any-word").val("");
+			$("#match-search").val("");
+		}
+
+		var obj = "/search?keyword=" + szKeyword + "&p=" + szPage + "&match=" + $("#match-search").val() + 
+					"&datestart=" + $("#date-start").val() + "&dateend=" + $("#date-end").val() + "&dropword=" + $("#drop-word").val() +
+					"&any-word=" + szAnyWord + "&search-all=" + szSearchAll;
+
+		$("#text-search").val(szKeyword);
+		$("#match-search").val(szMatch);
+		$("#date-start").val(szDateStart);
+		$("#date-end").val(szDateEnd);
+		$("#drop-word").val(szDropword);
+		$("#any-word").val(szAnyWord);
+		$("#search-all").val(szSearchAll);
+
+		m_iCurrent = parseInt(szPage);
+		Search(szKeyword, m_iCurrent);
+
+		return;
+	}
 });
